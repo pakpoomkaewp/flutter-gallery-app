@@ -1,2 +1,2 @@
 # flutter-gallery-app
-This Flutter project aims to create a functional gallery application as a practical learning experience. The core functionalities to be implemented include capturing new photos via the camera, selecting single and multiple images, and managing them with delete, save, and upload options.
+This project is a hands-on exercise to build a gallery app in Flutter, focusing on implementing a range of essential features. It will cover capturing images with the camera, selecting single or multiple images, and basic image management like deleting, saving, and uploading. A key learning objective is to integrate the native "Share to" functionality, allowing the app to receive images shared from other applications.
