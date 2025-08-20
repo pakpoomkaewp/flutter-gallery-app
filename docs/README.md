@@ -4,7 +4,7 @@ This directory contains technical documentation for the Flutter Gallery App.
 
 ## Available Documentation
 
-- [Android Storage Guide](android_storage_guide.md) - Comprehensive guide on handling file storage across different Android versions (5.0+)
+- [Mobile Storage Guide](mobile_storage_guide.md) - Comprehensive guide on handling file storage across different Android versions (5.0+) and iOS platforms
 
 ## Using This Documentation
 

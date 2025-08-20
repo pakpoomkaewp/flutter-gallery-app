@@ -5,4 +5,4 @@ This project is a hands-on exercise to build a gallery app in Flutter, focusing 
 
 Detailed technical documentation is available in the [docs](./docs) directory:
 
-- [Android Storage Guide](./docs/android_storage_guide.md) - Learn how to handle file storage across different Android versions (5.0+)
+- [Mobile Storage Guide](./docs/mobile_storage_guide.md) - Learn how to handle file storage across different Android versions (5.0+) and iOS platforms
