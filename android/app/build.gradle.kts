@@ -24,6 +24,8 @@ android {
         applicationId = "com.example.flutter_gallery_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // Set minSdk to 21 for camera apps to ensure Camera2 API support,
+        // better camera plugin compatibility, and access to modern camera features
         minSdk = 21
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
