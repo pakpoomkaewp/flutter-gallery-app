@@ -86,6 +86,8 @@ unlinked_spec.ds
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
+# Ignore Xcode workspace data files (user-specific settings)
+**/contents.xcworkspacedata
 
 # macOS
 **/Flutter/ephemeral/
