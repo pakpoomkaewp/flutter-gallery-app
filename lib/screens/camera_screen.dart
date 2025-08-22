@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gallery_app/providers/gallery_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -103,6 +105,9 @@ class _CameraScreenState extends State<CameraScreen> {
       await picture.saveTo(newPath);
 
       print('Picture saved permanently to $newPath');
+
+      // 4. Refresh the gallery provider to show the new image
+      await context.read<GalleryProvider>().refreshGallery();
 
       // Optional: Show a confirmation to the user
       ScaffoldMessenger.of(
