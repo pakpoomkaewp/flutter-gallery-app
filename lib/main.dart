@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gallery_app/providers/gallery_provider.dart';
 import 'package:flutter_gallery_app/screens/gallery_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,12 +12,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Gallery App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return ChangeNotifierProvider(
+      create: (_) => GalleryProvider(),
+      child: MaterialApp(
+        title: 'Flutter Gallery App',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
+        home: const GalleryScreen(),
       ),
-      home: const GalleryScreen(),
     );
   }
 }

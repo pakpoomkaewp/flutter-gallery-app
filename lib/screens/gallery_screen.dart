@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_gallery_app/providers/gallery_provider.dart';
+import 'package:provider/provider.dart';
+
 import 'camera_screen.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -12,14 +14,6 @@ class GalleryScreen extends StatefulWidget {
 }
 
 class _GalleryScreenState extends State<GalleryScreen> {
-  Future<List<File>>? _imageFiles;
-
-  @override
-  void initState() {
-    super.initState();
-    _imageFiles = _loadImages();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,29 +22,26 @@ class _GalleryScreenState extends State<GalleryScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () {
-              setState(() {
-                _imageFiles = _loadImages();
-              });
-            },
+            onPressed: () => context.read<GalleryProvider>().refreshGallery(),
             tooltip: 'Refresh Gallery',
           ),
         ],
       ),
-      body: FutureBuilder<List<File>>(
-        future: _imageFiles,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: Consumer<GalleryProvider>(
+        builder: (context, galleryProvider, child) {
+          if (galleryProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+          if (galleryProvider.errorMessage != null) {
+            return Center(
+              child: Text('Error: ${galleryProvider.errorMessage}'),
+            );
           }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          if (!galleryProvider.hasImages) {
             return const Center(child: Text('No photos yet. Go take some!'));
           }
 
-          final List<File> images = snapshot.data!;
+          final List<File> images = galleryProvider.images;
           return GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
@@ -76,21 +67,5 @@ class _GalleryScreenState extends State<GalleryScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
-  }
-
-  Future<List<File>> _loadImages() async {
-    final Directory appDir = await getApplicationDocumentsDirectory();
-    final List<FileSystemEntity> entities = appDir.listSync();
-    final List<File> imageFiles = entities
-        .where((entity) => entity is File && entity.path.endsWith('.jpg'))
-        .map((entity) => entity as File)
-        .toList();
-
-    // Sort by date, newest first
-    imageFiles.sort(
-      (a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()),
-    );
-
-    return imageFiles;
   }
 }
