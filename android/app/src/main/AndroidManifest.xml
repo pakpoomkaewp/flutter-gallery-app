@@ -2,7 +2,13 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
+
+    <!--
+      Note: android:requestLegacyExternalStorage="true" is not needed.
+      This flag is for apps targeting Android 10 (API 29) to opt-out of scoped storage.
+      For apps targeting Android 11 (API 30) and higher, this flag is ignored.
+      The WRITE_EXTERNAL_STORAGE permission is sufficient for the image_gallery_saver package.
+    -->
     <application
         android:label="flutter_gallery_app"
         android:name="${applicationName}"

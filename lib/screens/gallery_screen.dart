@@ -75,7 +75,25 @@ class _Actions extends StatelessWidget {
     final galleryProvider = context.watch<GalleryProvider>();
     return Row(
       children: [
-        if (galleryProvider.isSelecting)
+        if (galleryProvider.isSelecting) ...[
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: () async {
+              final results = await galleryProvider.saveSelectedImages();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      results.containsKey('permission')
+                          ? 'Permission denied.'
+                          : 'Saved ${results.length} images.',
+                    ),
+                  ),
+                );
+              }
+            },
+            tooltip: 'Save Selected Images',
+          ),
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () async {
@@ -104,6 +122,7 @@ class _Actions extends StatelessWidget {
             },
             tooltip: 'Delete Selected Images',
           ),
+        ],
         IconButton(
           icon: const Icon(Icons.refresh),
           onPressed: () => context.read<GalleryProvider>().refreshGallery(),

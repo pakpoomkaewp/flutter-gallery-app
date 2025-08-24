@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class GalleryProvider extends ChangeNotifier {
   List<File> _images = [];
@@ -66,6 +68,37 @@ class GalleryProvider extends ChangeNotifier {
     _selectedImages.clear();
     exitSelectionMode();
     await _loadImages();
+  }
+
+  Future<Map<String, String>> saveSelectedImages() async {
+    final Map<String, String> results = {};
+    PermissionStatus status;
+    if (Platform.isIOS) {
+      status = await Permission.photosAddOnly.request();
+    } else {
+      status = await Permission.storage.request();
+    }
+
+    if (status.isGranted) {
+      for (final image in _selectedImages) {
+        try {
+          final bytes = await image.readAsBytes();
+          final result = await ImageGallerySaver.saveImage(bytes);
+          if (result['isSuccess']) {
+            results[image.path] = 'success';
+          } else {
+            results[image.path] = result['errorMessage'] ?? 'Failed to save';
+          }
+        } catch (e) {
+          results[image.path] = 'Failed to save image: $e';
+        }
+      }
+      _selectedImages.clear();
+      exitSelectionMode();
+    } else {
+      return {'permission': 'denied'};
+    }
+    return results;
   }
 
   Future<void> _loadImages() async {
