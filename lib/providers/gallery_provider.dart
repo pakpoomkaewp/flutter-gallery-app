@@ -53,6 +53,21 @@ class GalleryProvider extends ChangeNotifier {
     return _selectedImages.contains(image);
   }
 
+  Future<void> deleteSelectedImages() async {
+    for (final image in _selectedImages) {
+      try {
+        if (await image.exists()) {
+          await image.delete();
+        }
+      } catch (e) {
+        _errorMessage = 'Failed to delete image: $e';
+      }
+    }
+    _selectedImages.clear();
+    exitSelectionMode();
+    await _loadImages();
+  }
+
   Future<void> _loadImages() async {
     _setLoading(true);
     _errorMessage = null;

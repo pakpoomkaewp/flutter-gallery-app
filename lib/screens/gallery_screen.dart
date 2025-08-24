@@ -12,16 +12,7 @@ class GalleryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: _Title(),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<GalleryProvider>().refreshGallery(),
-            tooltip: 'Refresh Gallery',
-          ),
-        ],
-      ),
+      appBar: AppBar(title: _Title(), actions: [_Actions()]),
       body: Consumer<GalleryProvider>(
         builder: (context, galleryProvider, child) {
           if (galleryProvider.isLoading) {
@@ -73,6 +64,53 @@ class _Title extends StatelessWidget {
       return Text('${galleryProvider.selectedCount} selected');
     }
     return const Text('My Gallery');
+  }
+}
+
+class _Actions extends StatelessWidget {
+  const _Actions();
+
+  @override
+  Widget build(BuildContext context) {
+    final galleryProvider = context.watch<GalleryProvider>();
+    return Row(
+      children: [
+        if (galleryProvider.isSelecting)
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Delete Selected Images'),
+                  content: const Text(
+                    'Are you sure you want to delete the selected images? This action cannot be undone.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Delete'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                await galleryProvider.deleteSelectedImages();
+              }
+            },
+            tooltip: 'Delete Selected Images',
+          ),
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () => context.read<GalleryProvider>().refreshGallery(),
+          tooltip: 'Refresh Gallery',
+        ),
+      ],
+    );
   }
 }
 

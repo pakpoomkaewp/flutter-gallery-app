@@ -6,7 +6,7 @@ This project is a hands-on exercise to build a gallery app in Flutter, focusing 
 
 - [x] Capture images with the camera
 - [x] Select single or multiple images from gallery
-- [ ] Delete images
+- [x] Delete images
 - [ ] Save images
 - [ ] Upload images
 - [ ] Receive shared images from other apps
