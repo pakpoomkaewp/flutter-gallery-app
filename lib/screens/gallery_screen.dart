@@ -13,7 +13,7 @@ class GalleryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Gallery'),
+        title: _Title(),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -60,6 +60,19 @@ class GalleryScreen extends StatelessWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+}
+
+class _Title extends StatelessWidget {
+  const _Title();
+
+  @override
+  Widget build(BuildContext context) {
+    final galleryProvider = context.watch<GalleryProvider>();
+    if (galleryProvider.isSelecting) {
+      return Text('${galleryProvider.selectedCount} selected');
+    }
+    return const Text('My Gallery');
   }
 }
 

@@ -16,6 +16,7 @@ class GalleryProvider extends ChangeNotifier {
   bool get hasImages => _images.isNotEmpty;
   bool get isSelecting => _isSelecting;
   List<File> get selectedImages => _selectedImages.toList();
+  int get selectedCount => _selectedImages.length;
 
   GalleryProvider() {
     _loadImages();
