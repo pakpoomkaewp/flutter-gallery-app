@@ -4,8 +4,8 @@ This project is a hands-on exercise to build a gallery app in Flutter, focusing 
 
 ## Features
 
-- [ ] Capture images with the camera
-- [ ] Select single or multiple images from gallery
+- [x] Capture images with the camera
+- [x] Select single or multiple images from gallery
 - [ ] Delete images
 - [ ] Save images
 - [ ] Upload images
