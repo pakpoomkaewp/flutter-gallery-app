@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gallery_app/providers/gallery_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
 import 'camera_screen.dart';
@@ -80,10 +80,33 @@ class _Actions extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () async {
-              final results = await galleryProvider.saveSelectedImages();
+              final state = await galleryProvider.requestPhotoPermission();
               if (!context.mounted) return;
 
-              if (results['permission'] == 'permanently_denied') {
+              if (state.isAuth) {
+                final results = await galleryProvider.saveImages();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Saved ${results.length} images.')),
+                  );
+                }
+
+                if (state == PermissionState.limited) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'You have granted limited photo access.',
+                      ),
+                      action: SnackBarAction(
+                        label: 'Select More',
+                        onPressed: () {
+                          PhotoManager.presentLimited();
+                        },
+                      ),
+                    ),
+                  );
+                }
+              } else {
                 await showDialog<void>(
                   context: context,
                   builder: (context) => AlertDialog(
@@ -98,7 +121,7 @@ class _Actions extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () async {
-                          await openAppSettings();
+                          await PhotoManager.openSetting();
                           if (context.mounted) {
                             Navigator.of(context).pop();
                           }
@@ -106,16 +129,6 @@ class _Actions extends StatelessWidget {
                         child: const Text('Open Settings'),
                       ),
                     ],
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      results.containsKey('permission')
-                          ? 'Permission denied.'
-                          : 'Saved ${results.length} images.',
-                    ),
                   ),
                 );
               }

@@ -47,9 +47,11 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs access to the camera to take photos.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>This app needs access to the microphone to record videos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Our app needs access to your photos to allow you to select and upload images.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app needs to save photos to your gallery.</string>
+	<string>Our app needs permission to save images to your photo library.</string>
+	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
+	<true/>
 </dict>
 </plist>
