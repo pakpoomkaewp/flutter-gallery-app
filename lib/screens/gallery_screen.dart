@@ -45,7 +45,23 @@ class GalleryScreen extends StatelessWidget {
             ),
             itemCount: images.length,
             itemBuilder: (context, index) {
-              return Image.file(images[index], fit: BoxFit.cover);
+              final image = images[index];
+              return _ImageBox(
+                file: image,
+                isSelected: galleryProvider.isImageSelected(image),
+                isSelecting: galleryProvider.isSelecting,
+                onTab: () {
+                  if (galleryProvider.isSelecting) {
+                    galleryProvider.toggleImageSelection(image);
+                  }
+                },
+                onLongPress: () {
+                  if (!galleryProvider.isSelecting) {
+                    galleryProvider.enterSelectionMode();
+                  }
+                  galleryProvider.toggleImageSelection(image);
+                },
+              );
             },
           );
         },
@@ -61,6 +77,72 @@ class GalleryScreen extends StatelessWidget {
         child: const Icon(Icons.camera_alt),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+}
+
+class _ImageBox extends StatelessWidget {
+  const _ImageBox({
+    required this.file,
+    required this.isSelected,
+    required this.isSelecting,
+    required this.onTab,
+    required this.onLongPress,
+  });
+
+  final File file;
+  final bool isSelected;
+  final bool isSelecting;
+  final VoidCallback onTab;
+  final VoidCallback onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTab,
+      onLongPress: onLongPress,
+      child: Stack(
+        children: [
+          Positioned.fill(child: Image.file(file, fit: BoxFit.cover)),
+          if (isSelecting)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.blue.withValues(alpha: 0.3)
+                      : Colors.black.withValues(alpha: 0.1),
+                  border: isSelected
+                      ? Border.all(color: Colors.blue, width: 3)
+                      : null,
+                ),
+              ),
+            ),
+          if (isSelecting)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.blue
+                      : Colors.white.withValues(alpha: 0.7),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected ? Colors.blue : Colors.grey,
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  isSelected ? Icons.check : null,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
