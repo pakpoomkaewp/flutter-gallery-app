@@ -80,57 +80,68 @@ class _Actions extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () async {
-              final state = await galleryProvider.requestPhotoPermission();
-              if (!context.mounted) return;
+              try {
+                final state = await galleryProvider.requestPhotoPermission();
+                if (!context.mounted) return;
 
-              if (state.isAuth) {
-                final results = await galleryProvider.saveImages();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Saved ${results.length} images.')),
-                  );
-                }
+                if (state.isAuth) {
+                  final results = await galleryProvider.saveImages();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Saved ${results.length} images.'),
+                      ),
+                    );
+                  }
 
-                if (state == PermissionState.limited) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                  if (state == PermissionState.limited) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          'You have granted limited photo access.',
+                        ),
+                        action: SnackBarAction(
+                          label: 'Select More',
+                          onPressed: () {
+                            PhotoManager.presentLimited();
+                          },
+                        ),
+                      ),
+                    );
+                  }
+                } else {
+                  await showDialog<void>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Permission Required'),
                       content: const Text(
-                        'You have granted limited photo access.',
+                        'To save photos, please grant access to your photo library in the app settings.',
                       ),
-                      action: SnackBarAction(
-                        label: 'Select More',
-                        onPressed: () {
-                          PhotoManager.presentLimited();
-                        },
-                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            await PhotoManager.openSetting();
+                            if (context.mounted) {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: const Text('Open Settings'),
+                        ),
+                      ],
                     ),
                   );
                 }
-              } else {
-                await showDialog<void>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Permission Required'),
-                    content: const Text(
-                      'To save photos, please grant access to your photo library in the app settings.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await PhotoManager.openSetting();
-                          if (context.mounted) {
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        child: const Text('Open Settings'),
-                      ),
-                    ],
-                  ),
-                );
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                }
+                return;
               }
             },
             tooltip: 'Save Selected Images',
