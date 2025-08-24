@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gallery_app/providers/gallery_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'camera_screen.dart';
@@ -80,7 +81,34 @@ class _Actions extends StatelessWidget {
             icon: const Icon(Icons.save),
             onPressed: () async {
               final results = await galleryProvider.saveSelectedImages();
-              if (context.mounted) {
+              if (!context.mounted) return;
+
+              if (results['permission'] == 'permanently_denied') {
+                await showDialog<void>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Permission Required'),
+                    content: const Text(
+                      'To save photos, please grant access to your photo library in the app settings.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await openAppSettings();
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: const Text('Open Settings'),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(

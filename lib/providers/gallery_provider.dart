@@ -79,6 +79,10 @@ class GalleryProvider extends ChangeNotifier {
       status = await Permission.storage.request();
     }
 
+    if (status.isPermanentlyDenied) {
+      return {'permission': 'permanently_denied'};
+    }
+
     if (status.isGranted) {
       for (final image in _selectedImages) {
         try {
