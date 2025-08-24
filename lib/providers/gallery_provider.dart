@@ -83,7 +83,7 @@ class GalleryProvider extends ChangeNotifier {
       return {'permission': 'permanently_denied'};
     }
 
-    if (status.isGranted) {
+    if (status.isGranted || status.isLimited) {
       for (final image in _selectedImages) {
         try {
           final bytes = await image.readAsBytes();
