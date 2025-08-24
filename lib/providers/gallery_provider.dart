@@ -7,11 +7,16 @@ class GalleryProvider extends ChangeNotifier {
   List<File> _images = [];
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isSelecting = false;
+  Set<File> _selectedImages = {};
 
   List<File> get images => _images;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get hasImages => _images.isNotEmpty;
+  bool get isSelecting => _isSelecting;
+  List<File> get selectedImages => _selectedImages.toList();
+  int get selectedCount => _selectedImages.length;
 
   GalleryProvider() {
     _loadImages();
@@ -49,5 +54,40 @@ class GalleryProvider extends ChangeNotifier {
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
+  }
+
+  // Selection methods
+  void enterSelectionMode() {
+    _isSelecting = true;
+    notifyListeners();
+  }
+
+  void exitSelectionMode() {
+    _isSelecting = false;
+    _selectedImages.clear();
+    notifyListeners();
+  }
+
+  void toggleImageSelection(File image) {
+    if (_selectedImages.contains(image)) {
+      _selectedImages.remove(image);
+    } else {
+      _selectedImages.add(image);
+    }
+    notifyListeners();
+  }
+
+  void selectAllImages() {
+    _selectedImages = Set.from(_images);
+    notifyListeners();
+  }
+
+  void clearSelection() {
+    _selectedImages.clear();
+    notifyListeners();
+  }
+
+  bool isImageSelected(File image) {
+    return _selectedImages.contains(image);
   }
 }

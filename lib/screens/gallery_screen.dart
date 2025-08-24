@@ -18,12 +18,88 @@ class _GalleryScreenState extends State<GalleryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Gallery'),
+        title: Consumer<GalleryProvider>(
+          builder: (context, galleryProvider, child) {
+            return galleryProvider.isSelecting
+                ? Text('${galleryProvider.selectedCount} selected')
+                : const Text('My Gallery');
+          },
+        ),
+        leading: Consumer<GalleryProvider>(
+          builder: (context, galleryProvider, child) {
+            if (galleryProvider.isSelecting) {
+              return IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => galleryProvider.exitSelectionMode(),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<GalleryProvider>().refreshGallery(),
-            tooltip: 'Refresh Gallery',
+          Consumer<GalleryProvider>(
+            builder: (context, galleryProvider, child) {
+              if (galleryProvider.isSelecting) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.select_all),
+                      onPressed: () => galleryProvider.selectAllImages(),
+                      tooltip: 'Select All',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: galleryProvider.selectedCount > 0
+                          ? () {
+                              // TODO: Implement delete functionality
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Delete functionality not implemented yet',
+                                  ),
+                                ),
+                              );
+                            }
+                          : null,
+                      tooltip: 'Delete Selected',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: galleryProvider.selectedCount > 0
+                          ? () {
+                              // TODO: Implement share functionality
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Share functionality not implemented yet',
+                                  ),
+                                ),
+                              );
+                            }
+                          : null,
+                      tooltip: 'Share Selected',
+                    ),
+                  ],
+                );
+              } else {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.select_all),
+                      onPressed: () => galleryProvider.enterSelectionMode(),
+                      tooltip: 'Select Images',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () => galleryProvider.refreshGallery(),
+                      tooltip: 'Refresh Gallery',
+                    ),
+                  ],
+                );
+              }
+            },
           ),
         ],
       ),
@@ -50,7 +126,74 @@ class _GalleryScreenState extends State<GalleryScreen> {
             ),
             itemCount: images.length,
             itemBuilder: (context, index) {
-              return Image.file(images[index], fit: BoxFit.cover);
+              final isSelected = galleryProvider.isImageSelected(images[index]);
+
+              return GestureDetector(
+                onTap: () {
+                  if (galleryProvider.isSelecting) {
+                    galleryProvider.toggleImageSelection(images[index]);
+                  } else {
+                    // Handle normal tap (e.g., view full image)
+                    // TODO: Navigator.push to full image view
+                  }
+                },
+                onLongPress: () {
+                  // Enter selection mode on long press if not already selecting
+                  if (!galleryProvider.isSelecting) {
+                    galleryProvider.enterSelectionMode();
+                  }
+                  galleryProvider.toggleImageSelection(images[index]);
+                },
+                child: Stack(
+                  children: [
+                    // Main image
+                    Positioned.fill(
+                      child: Image.file(images[index], fit: BoxFit.cover),
+                    ),
+
+                    // Selection overlay
+                    if (galleryProvider.isSelecting)
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Colors.blue.withOpacity(0.3)
+                                : Colors.black.withOpacity(0.1),
+                            border: isSelected
+                                ? Border.all(color: Colors.blue, width: 3)
+                                : null,
+                          ),
+                        ),
+                      ),
+
+                    // Checkmark icon
+                    if (galleryProvider.isSelecting)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Colors.blue
+                                : Colors.white.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? Colors.blue : Colors.grey,
+                              width: 2,
+                            ),
+                          ),
+                          child: Icon(
+                            isSelected ? Icons.check : null,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
             },
           );
         },
