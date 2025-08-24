@@ -44,25 +44,7 @@ class GalleryScreen extends StatelessWidget {
               mainAxisSpacing: 4.0,
             ),
             itemCount: images.length,
-            itemBuilder: (context, index) {
-              final image = images[index];
-              return _ImageBox(
-                file: image,
-                isSelected: galleryProvider.isImageSelected(image),
-                isSelecting: galleryProvider.isSelecting,
-                onTab: () {
-                  if (galleryProvider.isSelecting) {
-                    galleryProvider.toggleImageSelection(image);
-                  }
-                },
-                onLongPress: () {
-                  if (!galleryProvider.isSelecting) {
-                    galleryProvider.enterSelectionMode();
-                  }
-                  galleryProvider.toggleImageSelection(image);
-                },
-              );
-            },
+            itemBuilder: (context, index) => _ImageBox(images[index]),
           );
         },
       ),
@@ -82,28 +64,30 @@ class GalleryScreen extends StatelessWidget {
 }
 
 class _ImageBox extends StatelessWidget {
-  const _ImageBox({
-    required this.file,
-    required this.isSelected,
-    required this.isSelecting,
-    required this.onTab,
-    required this.onLongPress,
-  });
+  const _ImageBox(this.image);
 
-  final File file;
-  final bool isSelected;
-  final bool isSelecting;
-  final VoidCallback onTab;
-  final VoidCallback onLongPress;
+  final File image;
 
   @override
   Widget build(BuildContext context) {
+    final galleryProvider = context.watch<GalleryProvider>();
+    final isSelected = galleryProvider.isImageSelected(image);
+    final isSelecting = galleryProvider.isSelecting;
     return GestureDetector(
-      onTap: onTab,
-      onLongPress: onLongPress,
+      onTap: () {
+        if (galleryProvider.isSelecting) {
+          galleryProvider.toggleImageSelection(image);
+        }
+      },
+      onLongPress: () {
+        if (!galleryProvider.isSelecting) {
+          galleryProvider.enterSelectionMode();
+        }
+        galleryProvider.toggleImageSelection(image);
+      },
       child: Stack(
         children: [
-          Positioned.fill(child: Image.file(file, fit: BoxFit.cover)),
+          Positioned.fill(child: Image.file(image, fit: BoxFit.cover)),
           if (isSelecting)
             Positioned.fill(
               child: Container(
